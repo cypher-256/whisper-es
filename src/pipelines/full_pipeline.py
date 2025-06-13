@@ -49,7 +49,10 @@ def run_pipeline(
     )
 
 # … ASR-Transcribe --------------------------------------------
-    adv_transcribe = progress_hook.new_phase("ASR-Transcribe", 1)
+    if progress_hook:
+        adv_transcribe = progress_hook.new_phase("ASR-Transcribe", 1)
+    else:
+        adv_transcribe = lambda *_: None
     result = t.transcribe(
         audio_file,
         batch_size=asr_batch,
@@ -63,11 +66,15 @@ def run_pipeline(
     if not no_align:
         steps_align = len(result["segments"])
         adv_align = progress_hook.new_phase("ASR-Align", steps_align, "seg") if progress_hook else (lambda *_: None)
-        result = t.align(result, audio_file,
-                        device=device,
-                        return_char_alignments=return_char_alignments,
-                        on_chunk_end=lambda n: adv_align(n))
-        progress_hook.close_phase()
+        result = t.align(
+            result,
+            audio_file,
+            device=device,
+            return_char_alignments=return_char_alignments,
+            on_chunk_end=lambda n: adv_align(n),
+        )
+        if progress_hook:
+            progress_hook.close_phase()
 
 
 # --- fase Diarización ----------------------------------------------
@@ -88,4 +95,6 @@ def run_pipeline(
     merged = fmt.assign_speakers(diarize_df, result)
     path = fmt.save_jsonl(merged, output_jsonl)
     final_update(1)
+    if progress_hook:
+        progress_hook.close_phase()
     return path
