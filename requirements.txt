@@ -1,0 +1,11 @@
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch
+torchvision
+torchaudio
+openai-whisper
+whisperx
+yt-dlp[default]
+pandas
+pyannote.audio
+nvidia-cudnn-cu11==8.9.6.50
+tqdm
