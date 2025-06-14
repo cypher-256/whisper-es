@@ -1,4 +1,10 @@
-models/whisper/large-v2/
-models/whisper/large-v3/
-models/whisper/models--mobiuslabsgmbh--faster-whisper-large-v3-turbo/
-.venv
+# Entorno virtual de Python
+.venv/
+
+# Artefactos de Python compilados
+__pycache__/
+*.py[cod]
+
+# Modelos Whisper: NO se deben versionar
+models/whisper/**
+
