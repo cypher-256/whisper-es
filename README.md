@@ -25,6 +25,9 @@ Este proyecto proporciona un **pipeline** de transcripción automática y diariz
 * Crear entorno virtual e instalar dependencias:
 
   ```bash
+  git lfs install
+  git clone https://github.com/cypher-256/whisper-es.git
+  cd whisper-es
   python -m venv .venv
   source .venv/bin/activate  # o activate en Windows
   pip install --upgrade pip
@@ -99,3 +102,34 @@ pytest tests/
 ## Licencia
 
 Este proyecto está licenciado bajo la **MIT License**. Consulte el archivo `LICENSE` para más detalles.
+
+---
+
+## 💸 Donaciones
+
+Si este dataset te ha sido útil y deseas apoyar su desarrollo, puedes contribuir con una donación en Bitcoin o Monero. Estas contribuciones ayudan a mantener y expandir recursos abiertos para el procesamiento del lenguaje en español chileno.
+
+### Bitcoin (BTC – On-chain)
+
+**Dirección:**  
+`bc1p2t0gfxe3c0yw3rm3mdpgkrqwrpphgklhdt55lus3lmp4e86ljhnq4qkmp6`
+
+> Puedes usar cualquier billetera compatible con direcciones Taproot (P2TR), como Muun, Sparrow o BlueWallet.
+
+<img src="https://raw.githubusercontent.com/cypher-256/emotional-dataset-chile/main/assets/donacion_btc.png" alt="BTC QR" width="200"/>
+
+---
+
+### Monero (XMR – Anónimo)
+
+**Dirección:**  
+`44dS68RZrCY2cnoEWZYhtJJ3DXY52x75D2kCTLqffhpTWCFJUcty89W2VVUKCqE4J4WH8dnUJHCT1XQsXFkEKNyvQzqx8ar`
+
+> Puedes usar billeteras como Feather Wallet, Monerujo o Cake Wallet.
+
+<img src="https://raw.githubusercontent.com/cypher-256/emotional-dataset-chile/main/assets/donacion_xmr.png" alt="XMR QR" width="200"/>
+
+---
+
+Gracias por apoyar el software libre y la investigación abierta.
+
