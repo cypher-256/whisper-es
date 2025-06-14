@@ -24,30 +24,33 @@ Este proyecto proporciona un **pipeline** de transcripción automática y diariz
 * CUDA (opcional, para GPU)
 * Crear entorno virtual e instalar dependencias:
 
-  ```bash
-  git lfs install
-  git clone https://github.com/cypher-256/whisper-es.git
-  cd whisper-es
-  python -m venv .venv
-  source .venv/bin/activate  # o activate en Windows
-  pip install --upgrade pip
-  pip install -r requirements.txt
-  ```
-
-## Uso
+## Instalación rápida
 
 ```bash
-python main.py [OPCIONES] audio.wav
+# Clona el repositorio y ve al directorio
+git clone https://github.com/tu_usuario/whisper-es.git
+cd whisper-es
+
+# Prepara el entorno virtual (Python3 requerido)
+./setup_env.sh
+# Activa el entorno virtual
+source .venv/bin/activate
 ```
 
-### Ejemplos
+### Ejemplos de uso
 
-Transcribir con VAD Silero y sin alineación:
+Transcripción simple con GPU:
 
 ```bash
 python main.py tests/data/test_audio.wav \
-  --vad-method silero --vad-onset 0.4 --vad-offset 0.3 \
-  --no-align -o salida.jsonl --show-progress
+  -o tests/out/salida.jsonl --device cuda --show-progress
+```
+
+Transcripción simple con CPU:
+
+```bash
+python main.py tests/data/test_audio.wav \
+  -o tests/out/salida.jsonl --device cpu  --compute-type int8 --show-progress
 ```
 
 Transcribir con prompt inicial y beam size:
