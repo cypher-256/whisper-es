@@ -5,6 +5,5 @@
 __pycache__/
 *.py[cod]
 
-# Modelos Whisper: NO se deben versionar
-models/whisper/**
-
+models/whisper/*
+!models/whisper/README.md
