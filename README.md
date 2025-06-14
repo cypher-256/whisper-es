@@ -50,7 +50,7 @@ Transcripción simple con CPU:
 
 ```bash
 python main.py tests/data/test_audio.wav \
-  -o tests/out/salida.jsonl --device cpu  --compute-type int8 --show-progress
+  -o tests/out/salida.jsonl --device cpu  --show-progress
 ```
 
 Transcribir con prompt inicial y beam size:
