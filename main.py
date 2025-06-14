@@ -138,6 +138,12 @@ def main():
     if args.device == "cpu" and args.compute_type == "float16":
         #logging.warning("float16 no soportado en CPU → usando float32 en su lugar")
         args.compute_type = "float32"
+    if args.device == 'cpu' and args.compute_type == 'int8':
+        sys.stdout.write(
+            "WARNING: la cuantización int8 en CPU no está optimizada; "
+            "cambiando a float32 para evitar cuellos de botella.\n"
+        )
+        args.compute_type = 'float32'
     # 1. Inicializa hook de progreso
     progress_hook = ForcedProgressHook(transient=True) if args.show_progress else None
 

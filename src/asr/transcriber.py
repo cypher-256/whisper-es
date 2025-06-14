@@ -60,7 +60,7 @@ class Transcriber:
             device,
             compute_type=compute_type,
             language=language,
-            local_files_only=True,
+            #local_files_only=True,
             download_root=download_root,
             vad_method   = vad_method,
 
