@@ -21,7 +21,7 @@ Este proyecto proporciona un **pipeline** de transcripción automática y diariz
 ## Requisitos
 
 * Python 3.8+
-* CUDA
+* CUDA (CPU AÚN NO SOPORTADO)
 * Crear entorno virtual e instalar dependencias:
 
 ## Instalación rápida
@@ -46,7 +46,6 @@ python main.py tests/data/test_audio.wav \
   -o tests/out/salida.jsonl --device cuda --show-progress
 ```
 
-Transcripción simple con CPU:
 
 Transcribir con prompt inicial y beam size:
 
@@ -73,13 +72,6 @@ python main.py -h
 > * Diarización
 > * Utilidades
 
-## Pruebas
-
-Ejecuta la suite de tests con:
-
-```bash
-pytest tests/
-```
 
 ## Contribución
 
