@@ -21,7 +21,7 @@ Este proyecto proporciona un **pipeline** de transcripción automática y diariz
 ## Requisitos
 
 * Python 3.8+
-* CUDA (opcional, para GPU)
+* CUDA
 * Crear entorno virtual e instalar dependencias:
 
 ## Instalación rápida
@@ -47,11 +47,6 @@ python main.py tests/data/test_audio.wav \
 ```
 
 Transcripción simple con CPU:
-
-```bash
-python main.py tests/data/test_audio.wav \
-  -o tests/out/salida.jsonl --device cpu  --show-progress
-```
 
 Transcribir con prompt inicial y beam size:
 

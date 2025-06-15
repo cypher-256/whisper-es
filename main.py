@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#./main.py
 import types, sys, os
 
 import torch
@@ -122,7 +122,7 @@ def main():
     diar_group.add_argument(
         "--max-speakers",
         type=int,
-        default=15,
+        default=5,
         help="Número máximo de oradores a detectar"
     )
 
@@ -136,14 +136,9 @@ def main():
 
     args = parser.parse_args()
     if args.device == "cpu" and args.compute_type == "float16":
-        #logging.warning("float16 no soportado en CPU → usando float32 en su lugar")
-        args.compute_type = "float32"
-    if args.device == 'cpu' and args.compute_type == 'int8':
-        sys.stdout.write(
-            "WARNING: la cuantización int8 en CPU no está optimizada; "
-            "cambiando a float32 para evitar cuellos de botella.\n"
-        )
-        args.compute_type = 'float32'
+        logging.warning("float16 no soportado en CPU → usando int8 en su lugar")
+        args.compute_type = "int8"
+
     # 1. Inicializa hook de progreso
     progress_hook = ForcedProgressHook(transient=True) if args.show_progress else None
 

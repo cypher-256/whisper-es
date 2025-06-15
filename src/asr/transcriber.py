@@ -57,7 +57,7 @@ class Transcriber:
 
         self.model = whisperx.load_model(
             model_name,
-            device,
+            device=device,
             compute_type=compute_type,
             language=language,
             #local_files_only=True,
