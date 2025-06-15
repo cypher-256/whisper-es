@@ -3,6 +3,7 @@
 from src.asr.transcriber import Transcriber
 from src.diarization.diarizer import Diarizer
 from src.formatting.formatter import Formatter
+import pandas as pd
 
 def run_pipeline(
     model_name: str,
@@ -93,7 +94,30 @@ def run_pipeline(
         progress_hook.new_phase("Guardar", 1) if progress_hook else (lambda *_: None)
     )
     fmt = Formatter()
-    merged = fmt.assign_speakers(diarize_df, result)
+    if device == "cpu":
+        # Omitir diarización en CPU: asignamos todos los segmentos al parlante genérico "SPEAKER_00"
+        merged = fmt.assign_speakers(
+            # DataFrame vacío forzado para usar solo ASR
+            pd.DataFrame(columns=["start","end","speaker"]),
+            result
+        )
+    else:
+        # En GPU sí realizamos diarización
+        d = Diarizer(
+            min_speakers=min_speakers,
+            max_speakers=max_speakers,
+            device=device,
+            allow_tf32=allow_tf32,
+            progress_hook=progress_hook,
+        )
+        diarize_df = d.diarize(audio_file)
+        merged = fmt.assign_speakers(diarize_df, result)
+
+    # --- fase de guardado ----------------------------------------------
+    final_update = (
+        progress_hook.new_phase("Guardar", 1) if progress_hook else (lambda *_: None)
+    )
+    path = fmt.save_jsonl(merged, output_jsonl)
     path = fmt.save_jsonl(merged, output_jsonl)
     final_update(1)
     if progress_hook:

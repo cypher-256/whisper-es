@@ -135,8 +135,8 @@ def main():
     )
 
     args = parser.parse_args()
-    if args.device == "cpu" and args.compute_type == "float16":
-        logging.warning("float16 no soportado en CPU → usando int8 en su lugar")
+    if args.device == "cpu" and args.compute_type in ("float16", "float32"):
+        logging.warning("float16 no soportado en CPU y float32 muy lento → usando int8 en su lugar")
         args.compute_type = "int8"
 
     # 1. Inicializa hook de progreso
