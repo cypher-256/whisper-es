@@ -49,14 +49,15 @@ def run_pipeline(
     )
 
 # … ASR-Transcribe --------------------------------------------
+    batches = t.estimate_batches(audio_file, batch_size=asr_batch)
     if progress_hook:
-        adv_transcribe = progress_hook.new_phase("ASR-Transcribe", 1)
+        adv_transcribe = progress_hook.new_phase("ASR-Transcribe", batches, "lote")
     else:
         adv_transcribe = lambda *_: None
     result = t.transcribe(
         audio_file,
         batch_size=asr_batch,
-        on_batch_end=lambda *_: adv_transcribe()
+        on_batch_end=lambda *_: adv_transcribe(1)
     )
     if progress_hook:
         adv_transcribe() 
