@@ -138,6 +138,18 @@ def main():
     if args.device == "cpu" and args.compute_type in ("float16", "float32"):
         logging.warning("float16 no soportado en CPU y float32 muy lento → usando int8 en su lugar")
         args.compute_type = "int8"
+    if args.device == "cpu":
+        logging.warning("Diarización y alineación no soportadas en CPU, solo transcripción")
+        logging.warning("Usando batch_size de 1 debido a uso de CPU")
+        logging.warning("Usando chunk_size size de 15 debido a uso de CPU")
+        logging.warning("Usando vad_method silero debido a uso de CPU")
+        logging.warning("Usando modelo tiny debido a uso de CPU")
+        args.model        = "tiny"
+        args.asr_batch = 1
+        args.no_align = True
+        args.threads      = os.cpu_count()
+        args.chunk_size   = 15
+        args.vad_method   = "silero"
 
     # 1. Inicializa hook de progreso
     progress_hook = ForcedProgressHook(transient=True) if args.show_progress else None
