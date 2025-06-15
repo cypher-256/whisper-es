@@ -21,7 +21,7 @@ Este proyecto proporciona un **pipeline** de transcripción automática y diariz
 ## Requisitos
 
 * Python 3.8+
-* CUDA (CPU AÚN NO SOPORTADO)
+* CUDA (CPU AÚN NO SOPORTADO, MUY LENTO)
 * Crear entorno virtual e instalar dependencias:
 
 ## Instalación rápida
