@@ -11,13 +11,15 @@ class Diarizer:
         min_speakers: int = 3,
         max_speakers: int = 15,
         device: str = "cuda",
+        device_index: int = 0,
         models_root: str = "models/pyannote",
         allow_tf32: bool = False,
         progress_hook: ProgressHook = None,
     ):
         self.min_speakers = min_speakers
         self.max_speakers = max_speakers
-        self.use_cuda = (device == "cuda")
+        self.use_cuda = device.startswith("cuda")
+        self.device_index = device_index
         self.models_root = models_root
         self.allow_tf32 = allow_tf32
         self.progress_hook = progress_hook
@@ -30,7 +32,8 @@ class Diarizer:
         pipeline = load_local_pipeline(
             models_root=self.models_root,
             use_cuda=self.use_cuda,
-            allow_tf32=self.allow_tf32
+            allow_tf32=self.allow_tf32,
+            device_index=self.device_index,
         )
         waveform, sample_rate = torchaudio.load(audio_path)
         return pipeline(
