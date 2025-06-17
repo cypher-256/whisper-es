@@ -21,14 +21,20 @@ Este proyecto proporciona un **pipeline** de transcripción automática y diariz
 ## Requisitos
 
 * Python 3.8+
-* CUDA (CPU AÚN NO SOPORTADO, MUY LENTO)
-* Crear entorno virtual e instalar dependencias:
+* CUDA
+* Tener Git LFS instalado
 
 ## Instalación rápida
 
 ```bash
-# Clona el repositorio y ve al directorio
+# Instala Git LFS
+sudo apt update
+sudo apt install git-lfs
+
+# Inicia Git LFS
 git lfs install
+
+# Clona el repositorio y ve al directorio
 git clone https://github.com/cypher-256/whisper-es.git
 cd whisper-es
 
