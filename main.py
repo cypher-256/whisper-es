@@ -36,6 +36,11 @@ def main():
         default="transcripcion_diarizada.jsonl",
         help="Ruta de salida JSONL"
     )
+    io_group.add_argument(
+        "-s", "--output-srt",
+        default=None,
+        help="Ruta opcional de salida en formato SRT"
+    )
 
     # — Grupo ASR —
     asr_group = parser.add_argument_group("Opciones ASR")
@@ -179,6 +184,7 @@ def main():
             model_name    = args.model,
             audio_file    = args.audio,
             output_jsonl  = args.output,
+            output_srt    = args.output_srt,
             device        = args.device,
             asr_batch     = args.asr_batch,
             compute_type  = args.compute_type,

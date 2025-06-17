@@ -17,6 +17,7 @@ Este proyecto proporciona un **pipeline** de transcripción automática y diariz
 * **Decodificación**: temperatura, beam size, prompt inicial.
 * **Diarización**: número mínimo/máximo de oradores.
 * **Barra de progreso**: fases unificadas (transcribe, align, diarize, guardar).
+* **Exportación SRT**: guarda los segmentos en subtítulos opcionalmente.
 
 ## Requisitos
 
@@ -64,7 +65,8 @@ Transcripción simple con GPU:
 
 ```bash
 python main.py tests/data/test_audio.wav \
-  -o tests/out/salida.jsonl --device cuda --show-progress
+  -o tests/out/salida.jsonl -s tests/out/salida.srt \
+  --device cuda --show-progress
 ```
 
 Transcripción simple con CPU (diarización no soportada):

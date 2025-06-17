@@ -23,3 +23,27 @@ class Formatter:
                     continue
                 f.write(json.dumps(seg, ensure_ascii=False) + "\n")
         return str(out_path)
+
+    def save_srt(self, merged: dict, output_srt: str) -> str:
+        """Guarda los segmentos en formato SRT y retorna la ruta."""
+
+        def fmt(ts: float) -> str:
+            hours, rem = divmod(ts, 3600)
+            minutes, seconds = divmod(rem, 60)
+            millis = round((seconds - int(seconds)) * 1000)
+            return f"{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d},{millis:03d}"
+
+        out_path = Path(output_srt)
+        with out_path.open("w", encoding="utf-8") as f:
+            for i, seg in enumerate(merged["segments"], start=1):
+                text = seg["text"].strip()
+                if not text:
+                    continue
+                speaker = seg.get("speaker")
+                if speaker:
+                    text = f"[{speaker}] {text}"
+                f.write(f"{i}\n")
+                start = fmt(seg["start"])
+                end = fmt(seg["end"])
+                f.write(f"{start} --> {end}\n{text}\n\n")
+        return str(out_path)

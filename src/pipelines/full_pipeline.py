@@ -4,11 +4,13 @@ from src.asr.transcriber import Transcriber
 from src.diarization.diarizer import Diarizer
 from src.formatting.formatter import Formatter
 import pandas as pd
+from typing import Optional
 
 def run_pipeline(
     model_name: str,
     audio_file: str,
     output_jsonl: str,
+    output_srt: Optional[str],
     device: str,
     asr_batch: int,
     compute_type: str,
@@ -99,6 +101,8 @@ def run_pipeline(
     fmt = Formatter()
     merged = fmt.assign_speakers(diarize_df, result)
     path = fmt.save_jsonl(merged, output_jsonl)
+    if output_srt:
+        fmt.save_srt(merged, output_srt)
     final_update(1)
     if progress_hook:
         progress_hook.close_phase()
