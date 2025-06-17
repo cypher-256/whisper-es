@@ -22,6 +22,7 @@ Este proyecto proporciona un **pipeline** de transcripción automática y diariz
 
 * Python 3.8+
 * CUDA (Para GPU)
+* ffmpeg
 
 ## Instalación rápida
 
