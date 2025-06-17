@@ -1,0 +1,1 @@
+Directorio de salida de prueba
