@@ -28,7 +28,7 @@ Este proyecto proporciona un **pipeline** de transcripción automática y diariz
 
 ```bash
 # Clona el repositorio y ve al directorio
-git clone https://github.com/tu_usuario/whisper-es.git
+git clone https://github.com/cypher-256/whisper-es.git
 cd whisper-es
 
 # Prepara el entorno virtual (Python3 requerido)
