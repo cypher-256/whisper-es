@@ -2,6 +2,8 @@
 
 from itertools import islice
 import whisperx
+import tqdm
+from contextlib import contextmanager
 import logging
 import os
 import torch
@@ -73,6 +75,38 @@ class Transcriber:
             # ← Opciones de decodificación
             asr_options = asr_opts,
         )
+
+    @contextmanager
+    def _patch_tqdm(self, advance):
+        """Redirect tqdm updates to the provided callback."""
+        original_tqdm = tqdm.tqdm
+
+        class Proxy:
+            def __init__(self, total=0, unit="", disable=False, *a, **k):
+                self.total = total
+                self.n = 0
+                self.disable = disable
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                if not self.disable and self.n < self.total:
+                    advance(self.total - self.n)
+
+            def update(self, n=1):
+                if not self.disable:
+                    advance(n)
+                self.n += n
+
+        def factory(*a, **k):
+            return Proxy(*a, **k)
+
+        tqdm.tqdm = factory
+        try:
+            yield
+        finally:
+            tqdm.tqdm = original_tqdm
     def _enable_tf32(self):
         """
         Anula el fix de reproducibilidad de Pyannote y fuerza TF32
@@ -89,12 +123,12 @@ class Transcriber:
         if self.allow_tf32:
             self._enable_tf32()
 
-        result = self.model.transcribe(
-            audio_path,
-            batch_size=batch_size,
-        )
-
-        on_batch_end(1)
+        with self._patch_tqdm(on_batch_end):
+            result = self.model.transcribe(
+                audio_path,
+                batch_size=batch_size,
+                verbose=False,
+            )
         if self.allow_tf32:
             self._enable_tf32()
             logging.warning("CUIDADO: TF32 forzado en VAD (WhisperX)")
