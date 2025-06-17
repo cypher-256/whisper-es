@@ -2,11 +2,6 @@
 # Sólo los modelos que SÍ quiero en LFS
 ###############################################################################
 
-# Wav2Vec / Align
-models/align/**/*.bin      filter=lfs diff=lfs merge=lfs -text
-models/align/**/*.msgpack  filter=lfs diff=lfs merge=lfs -text
-models/align/w2v_spanish/language_model/lm.binary filter=lfs diff=lfs merge=lfs -text
-
 # Pyannote
 models/pyannote/**/*.bin   filter=lfs diff=lfs merge=lfs -text
 

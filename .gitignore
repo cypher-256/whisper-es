@@ -5,5 +5,9 @@
 __pycache__/
 *.py[cod]
 
+# Ignorar todos los modelos Whisper, excepto README
 models/whisper/*
 !models/whisper/README.md
+
+# Ignorar todos los archivos pesados de align
+models/align/*
