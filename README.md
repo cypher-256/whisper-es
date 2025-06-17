@@ -151,5 +151,5 @@ Si este dataset te ha sido útil y deseas apoyar su desarrollo, puedes contribui
 
 ---
 
-Gracias por apoyar el software libre y la investigación abierta.
+Gracias por apoyar el open source y la investigación abierta.
 
