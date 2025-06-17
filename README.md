@@ -28,6 +28,7 @@ Este proyecto proporciona un **pipeline** de transcripción automática y diariz
 
 ```bash
 # Clona el repositorio y ve al directorio
+git lfs install
 git clone https://github.com/cypher-256/whisper-es.git
 cd whisper-es
 
