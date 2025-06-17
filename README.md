@@ -21,18 +21,13 @@ Este proyecto proporciona un **pipeline** de transcripción automática y diariz
 ## Requisitos
 
 * Python 3.8+
-* CUDA
-* Tener Git LFS instalado
+* CUDA (Para GPU)
 
 ## Instalación rápida
 
 ```bash
-# Instala Git LFS
+# Actualiza
 sudo apt update
-sudo apt install git-lfs
-
-# Inicia Git LFS
-git lfs install
 
 # Clona el repositorio y ve al directorio
 git clone https://github.com/cypher-256/whisper-es.git
@@ -53,6 +48,14 @@ python main.py tests/data/test_audio.wav \
   -o tests/out/salida.jsonl --device cuda --show-progress
 ```
 
+Transcripción simple con CPU (diarización no soportada):
+
+```bash
+python main.py tests/data/test_audio.wav \
+  -o tests/out/salida.jsonl --device cpu --show-progress
+```
+
+### Ejemplos de uso avanzado:
 
 Transcribir con prompt inicial y beam size:
 
