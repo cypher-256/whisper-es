@@ -16,3 +16,6 @@ models/align/*
 # Ignorar todos los archivos pesados de pyannote
 models/pyannote/*.bin
 !models/pyannote/README.md
+
+# Ignorar salidas de prueba
+tests/out/*

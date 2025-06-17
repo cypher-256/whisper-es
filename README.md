@@ -40,6 +40,24 @@ cd whisper-es
 source .venv/bin/activate
 ```
 
+## Archivo de ejemplo
+
+El archivo `tests/data/test_audio.wav` corresponde a la grabación de la conferencia:
+
+> “Diego Portales: permanencia y vigencia de su pensamiento, voluntad y visión de Chile a 150 años de su muerte”  
+> Biblioteca Nacional (Salón Los Fundadores), 4 de junio de 1987
+
+**Detalles bibliográficos**  
+- **Autor:** Arnello Romo, Mario (1925-)  
+- **Colección:** Archivo Audiovisual / Archivo de la Palabra  
+- **Materias:** ARCHIVO DE LA PALABRA  
+- **Tipo de objeto:** Grabación sonora  
+- **Tipo de acceso:** Acceso en línea  
+- **BN Código:** AP0000218  
+- **N° Sistema:** 258258  
+- **BND id:** 320360  
+- **Enlace:** https://www.bibliotecanacionaldigital.gob.cl/visor/BND:320360
+
 ### Ejemplos de uso
 
 Transcripción simple con GPU:
