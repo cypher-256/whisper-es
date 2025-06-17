@@ -32,4 +32,18 @@ grep -q "## Rutas cuDNN/cuBLAS" "$ACTIVATE" || cat >> "$ACTIVATE" <<EOF
 export LD_LIBRARY_PATH="$CU_LIB_PATH:\${LD_LIBRARY_PATH:-}"
 EOF
 
+echo "→ Descargando modelos Pyannote"
+mkdir -p models/pyannote
+BASE_URL="https://github.com/cypher-256/whisper-es/releases/download/v1.0"
+
+for MODEL in \
+  pyannote_model_segmentation-3.0.bin \
+  pyannote_model_wespeaker-voxceleb-resnet34-LM.bin; do
+  echo "   – ${MODEL}"
+  wget --progress=dot:giga \
+       "${BASE_URL}/${MODEL}" \
+       -O "models/pyannote/${MODEL}"
+done
+
 echo "→ Entorno preparado. Actívalo con: source $VENV_DIR/bin/activate"
+
