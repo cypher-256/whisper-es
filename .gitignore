@@ -11,6 +11,8 @@ models/whisper/*
 
 # Ignorar todos los archivos pesados de align
 models/align/*
+!models/align/README.md
 
 # Ignorar todos los archivos pesados de pyannote
 models/pyannote/*.bin
+!models/pyannote/README.md
