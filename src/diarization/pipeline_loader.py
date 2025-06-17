@@ -13,6 +13,7 @@ def load_local_pipeline(
     models_root: str = "models/pyannote",
     use_cuda: bool = True,
     allow_tf32: bool = False,
+    device_index: int = 0,
 ) -> Pipeline:
     """
     Carga un pipeline de diarización desde config local.
@@ -23,6 +24,7 @@ def load_local_pipeline(
       - use_cuda: si es False, fuerza CPU.
       - allow_tf32: si es True, habilita TF32 para optimizar rendimiento,
         aunque los resultados pueden variar ligeramente.
+      - device_index: GPU a utilizar cuando use_cuda es True.
 
     Retorna:
       Instancia de pyannote.audio.Pipeline en CPU o GPU.
@@ -40,7 +42,7 @@ def load_local_pipeline(
         return pipeline
 
     try:
-        idx = 0
+        idx = device_index
         device = torch.device(f"cuda:{idx}")
         torch.cuda.set_device(device)
         pipeline.to(device)

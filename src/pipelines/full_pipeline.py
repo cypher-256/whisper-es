@@ -10,6 +10,7 @@ def run_pipeline(
     audio_file: str,
     output_jsonl: str,
     device: str,
+    device_index: int,
     asr_batch: int,
     compute_type: str,
     min_speakers: int,
@@ -30,12 +31,15 @@ def run_pipeline(
     """
     Ejecuta todo el flujo de trabajo de ASR + alineación + diarización + guardado.
     Todos los parámetros se reciben desde main.py.
+    `device_index` indica qué GPU utilizar cuando hay más de una disponible.
     """
     
 # --- inicio fase ASR-Transcribe ----------------------------------
+    device_str = device if device == "cpu" else f"cuda:{device_index}"
+
     t = Transcriber(
         model_name=model_name,
-        device=device,
+        device=device_str,
         compute_type=compute_type,
         language="es",
         download_root=model_dir,
@@ -71,7 +75,7 @@ def run_pipeline(
         result = t.align(
             result,
             audio_file,
-            device=device,
+            device=device_str,
             return_char_alignments=return_char_alignments,
             on_chunk_end=lambda n: adv_align(n),
         )
@@ -84,6 +88,7 @@ def run_pipeline(
         min_speakers=min_speakers,
         max_speakers=max_speakers,
         device=device,
+        device_index=device_index,
         allow_tf32=allow_tf32,
         progress_hook=progress_hook,
     )
