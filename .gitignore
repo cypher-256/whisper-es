@@ -11,3 +11,6 @@ models/whisper/*
 
 # Ignorar todos los archivos pesados de align
 models/align/*
+
+# Ignorar todos los archivos pesados de pyannote
+models/pyannote/*.bin
