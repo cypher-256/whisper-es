@@ -13,6 +13,23 @@ $PYTHON -m venv "$VENV_DIR"
 echo "→ Instalando dependencias"
 # shellcheck disable=SC1091
 source "$VENV_DIR/bin/activate"
+
+# 2.b Instalar PyTorch según GPU o CPU
+echo "→ Comprobando soporte GPU"
+if command -v nvidia-smi &> /dev/null; then
+  echo "   • GPU detectada: instalando PyTorch con CUDA"
+  pip install --upgrade \
+    torch torchvision torchaudio \
+    --index-url https://download.pytorch.org/whl/cu128
+else
+  echo "   • Sin GPU: instalando PyTorch CPU-only"
+  pip install --upgrade \
+    torch torchvision torchaudio \
+    --index-url https://download.pytorch.org/whl/cpu
+fi
+
+# 2.c Instalar el resto de dependencias
+echo "→ Instalando dependencias adicionales"
 pip install --upgrade pip
 pip install -r requirements.txt
 
