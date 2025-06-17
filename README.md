@@ -66,7 +66,8 @@ Transcripción simple con GPU:
 ```bash
 python main.py tests/data/test_audio.wav \
   -o tests/out/salida.jsonl -s tests/out/salida.srt \
-  --device cuda --show-progress
+  --device cuda --show-progress \
+  -o tests/out/salida.jsonl --device cuda --device-index 0 --show-progress
 ```
 
 Transcripción simple con CPU (diarización no soportada):
@@ -83,7 +84,7 @@ Transcribir con prompt inicial y beam size:
 ```bash
 python main.py audio.wav \
   --initial-prompt "Hola mundo" --beam-size 2 \
-  --temperature 0.8 -o resultado.jsonl
+  --temperature 0.8 --device cuda --device-index 0 -o resultado.jsonl
 ```
 
 ## Opciones de la CLI

@@ -66,6 +66,12 @@ def main():
         help="Dispositivo de cómputo ('cuda' o 'cpu')"
     )
     asr_group.add_argument(
+        "--device-index",
+        type=int,
+        default=0,
+        help="Índice de GPU a utilizar cuando device es 'cuda'",
+    )
+    asr_group.add_argument(
         "--asr-batch",
         type=int,
         default=8, #96
@@ -155,6 +161,7 @@ def main():
         args.threads      = os.cpu_count()
         args.chunk_size   = 15
         args.vad_method   = "silero"
+        args.device_index = 0
 
     # 1. Inicializa hook de progreso
     progress_hook = ForcedProgressHook(transient=True) if args.show_progress else None
@@ -186,6 +193,7 @@ def main():
             output_jsonl  = args.output,
             output_srt    = args.output_srt,
             device        = args.device,
+            device_index  = args.device_index,
             asr_batch     = args.asr_batch,
             compute_type  = args.compute_type,
             min_speakers  = args.min_speakers,
