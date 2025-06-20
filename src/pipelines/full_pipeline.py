@@ -22,10 +22,12 @@ def run_pipeline(
     vad_offset: float,
     chunk_size: int,
     no_align: bool,
+    no_diarize: bool,
     return_char_alignments: bool,
     temperature: float,
     beam_size: int,
-    initial_prompt: str
+    initial_prompt: str,
+    align_model_name: str,
 ) -> str:
     """
     Ejecuta todo el flujo de trabajo de ASR + alineación + diarización + guardado.
@@ -47,6 +49,7 @@ def run_pipeline(
         temperature= temperature,
         beam_size  = beam_size,
         initial_prompt = initial_prompt,
+        align_model_name = align_model_name,
     )
 
 # … ASR-Transcribe --------------------------------------------
@@ -79,18 +82,20 @@ def run_pipeline(
             progress_hook.close_phase()
 
 
-# --- fase Diarización ----------------------------------------------
-    d = Diarizer(
-        min_speakers=min_speakers,
-        max_speakers=max_speakers,
-        device=device,
-        allow_tf32=allow_tf32,
-        progress_hook=progress_hook,
-    )
-    if device == "cpu":
-        diarize_df = pd.DataFrame(columns=["start","end","speaker"])
-    else:
+    # --- fase Diarización (si está permitida y hay CUDA) ---
+    if not no_diarize and device != "cpu":
+        d = Diarizer(
+            min_speakers=min_speakers,
+            max_speakers=max_speakers,
+            device=device,
+            #device_index=device_index,
+            allow_tf32=allow_tf32,
+            progress_hook=progress_hook,
+        )
         diarize_df = d.diarize(audio_file)
+    else:
+        # Omitir diarización → DataFrame vacío
+        diarize_df = pd.DataFrame(columns=["start", "end", "speaker"])
     
 # --- fase fusión y guardado ----------------------------------------------
     final_update = (

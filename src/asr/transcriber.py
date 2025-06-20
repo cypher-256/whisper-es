@@ -1,6 +1,9 @@
 # src/asr/transcriber.py
 
 from itertools import islice
+from contextlib import contextmanager
+import builtins
+import re
 import whisperx
 import logging
 import os
@@ -39,7 +42,10 @@ class Transcriber:
         temperature,
         beam_size,
         initial_prompt,
+        align_model_name: str = None,
     ):
+        self.model_name = model_name
+        self.align_model_name = align_model_name
         self.allow_tf32 = allow_tf32
 
         # --- NUEVO: bloquea el fix de reproducibilidad ----
@@ -82,6 +88,31 @@ class Transcriber:
         torch.backends.cuda.matmul.allow_tf32 = True
         torch.backends.cudnn.allow_tf32     = True
 
+    @contextmanager
+    def _capture_progress(self, advance):
+        """
+        Intercepta los prints de progreso de WhisperX y llama a `advance(…)`.
+        """
+        original_print = builtins.print
+        # Coincide líneas que empiecen por "Progress: "
+        pattern = re.compile(r"^Progress:\s*([\d\.]+)%")
+
+        def patched(*args, **kwargs):
+            if args and isinstance(args[0], str):
+                m = pattern.match(args[0])
+                if m:
+                    # extraigo porcentaje y avanzo proporcionalmente
+                    pct = float(m.group(1))
+                    advance(pct)
+                    return
+            original_print(*args, **kwargs)
+
+        builtins.print = patched
+        try:
+            yield
+        finally:
+            builtins.print = original_print
+
     def transcribe(self, audio_path: str, batch_size: int, on_batch_end=lambda *_: None, ) -> dict:
         """
         Ejecuta la transcripción y devuelve el dict con keys: language, segments, etc.
@@ -89,10 +120,14 @@ class Transcriber:
         if self.allow_tf32:
             self._enable_tf32()
 
-        result = self.model.transcribe(
-            audio_path,
-            batch_size=batch_size,
-        )
+        # Capturamos el print “Progress: xx%”
+        with self._capture_progress(on_batch_end):
+            result = self.model.transcribe(
+                audio_path,
+                batch_size=batch_size,
+                print_progress=True,
+                verbose=False,
+            )
 
         on_batch_end(1)
         if self.allow_tf32:
@@ -103,17 +138,33 @@ class Transcriber:
         return result
     
 
-    def align(self, result, audio_path, device, return_char_alignments=False, on_chunk_end=lambda *_: None) -> dict:
+    def align(self, result, audio_path, device, return_char_alignments, on_chunk_end=lambda *_: None) -> dict:
         """
         Reemplaza result["segments"] por segmentos alineados palabra a palabra.
         """
         if self.allow_tf32:
             self._enable_tf32()
+
+        # Determinar qué nombre de modelo pasar a load_align_model
+        # Prioridad: --align_model (self.align_model_name) > forced para large-v2/turbo > None
+        if self.align_model_name:
+            chosen = self.align_model_name
+            model_dir = "models/align/w2v_spanish"
+        elif self.model_name in ("large-v2", "turbo"):
+            chosen = "WAV2VEC2_ASR_LARGE_LV60K_960H"
+            model_dir = "models/align/w2v_spanish"
+        else:
+            chosen = None
+            model_dir = "models/align/w2v_spanish"
+
         align_model, meta = whisperx.load_align_model(
-            result["language"],
+            language_code=result["language"],
             device=device,
-            model_dir="models/align/w2v_spanish",
+            model_name=chosen,     
+            model_dir=model_dir,    
         )
+
+
         segs = [seg for seg in result["segments"] if seg["text"].strip()]
         aligned = []
         for chunk in batch(segs, 25):
