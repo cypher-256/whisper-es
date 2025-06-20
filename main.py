@@ -183,7 +183,21 @@ def main():
 
 
     if args.asr_batch is None:
-        args.asr_batch = 2 if args.device == "cpu" else 8
+        if args.device == "cpu":
+            # En CPU, limitamos el batch según núcleos disponibles
+            # para no saturar la memoria RAM ni los hilos de Torch.
+            # Por ejemplo, podemos fijar batch = núcleos // 2, con mínimo 1 y máximo 4.
+            cores = os.cpu_count() or 1
+            args.asr_batch = max(1, min(4, cores // 2))
+        else:
+            # En GPU, miramos la VRAM total y dimensionamos batch
+            props = torch.cuda.get_device_properties(0)
+            vram_gb = props.total_memory / (1024 ** 3)
+            # Escalamos batch con un factor de 2 lotes por GB de VRAM
+            # y lo limitamos entre 4 y 16 para seguridad.
+            estimated = int(vram_gb * 2)
+            args.asr_batch = max(4, min(16, estimated))
+
 
     if args.device == "cpu" and args.compute_type in ("float16", "float32"):
         logging.warning("float16 no soportado en CPU y float32 muy lento → usando int8 en su lugar")
