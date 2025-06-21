@@ -22,3 +22,4 @@ tests/out/*
 compare_bench.py
 grid_benchmark.sh
 recommend_config.py
+logs
