@@ -42,10 +42,12 @@ class Transcriber:
         temperature,
         beam_size,
         initial_prompt,
+        align_batch,
         align_model_name: str = None,
     ):
         self.model_name = model_name
         self.align_model_name = align_model_name
+        self.align_batch = align_batch
         self.allow_tf32 = allow_tf32
 
         # --- NUEVO: bloquea el fix de reproducibilidad ----
@@ -167,7 +169,7 @@ class Transcriber:
 
         segs = [seg for seg in result["segments"] if seg["text"].strip()]
         aligned = []
-        for chunk in batch(segs, 25):
+        for chunk in batch(segs, self.align_batch):
             out = whisperx.align(
                 chunk,
                 align_model,
@@ -182,7 +184,7 @@ class Transcriber:
         return result
 
 
-    def estimate_batches(self, audio_path: str, batch_size: int = 96) -> int:
+    def estimate_batches(self, audio_path: str, batch_size: int) -> int:
         """
         Devuelve cuántos lotes (aprox.) procesará WhisperX.
 

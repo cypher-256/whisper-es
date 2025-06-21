@@ -3,7 +3,8 @@
 from src.asr.transcriber import Transcriber
 from src.diarization.diarizer import Diarizer
 from src.formatting.formatter import Formatter
-import pandas as pd
+import logging, psutil, pandas as pd, torch
+logger = logging.getLogger(__name__)
 
 def run_pipeline(
     model_name: str,
@@ -28,13 +29,35 @@ def run_pipeline(
     beam_size: int,
     initial_prompt: str,
     align_model_name: str,
+    align_batch: int,
 ) -> str:
     """
     Ejecuta todo el flujo de trabajo de ASR + alineación + diarización + guardado.
     Todos los parámetros se reciben desde main.py.
     """
-    
-# --- inicio fase ASR-Transcribe ----------------------------------
+
+    # ----------------------------------------------------------
+    # 1.  CÁLCULO AUTOMÁTICO DEL align_batch  (si el usuario no lo fijó)
+    # ----------------------------------------------------------
+    if align_batch is None:
+        avail_mib    = psutil.virtual_memory().available // (1024 * 1024)
+        safety_ratio = 0.45          # usar el 40 % de la RAM libre
+        est_mib_seg  = 0.25          # MiB aprox. por segmento
+        calc_batch   = int((avail_mib * safety_ratio) / est_mib_seg)
+
+        # Sólo mínimo, sin tope:
+        align_batch = max(10, calc_batch)
+
+        # —o— mínimo y tope superior de 5000:
+        #align_batch = max(10, min(calc_batch, 5000))
+
+        logger.info(
+            f"align_batch dinámico = {align_batch} "
+            f"(RAM libre ≈ {avail_mib} MiB, calc_batch ≈ {calc_batch})"
+    )
+    # ----------------------------------------------------------
+    # 2.  CREACIÓN DEL TRANSCRIBER
+    # ----------------------------------------------------------
     t = Transcriber(
         model_name=model_name,
         device=device,
@@ -50,24 +73,52 @@ def run_pipeline(
         beam_size  = beam_size,
         initial_prompt = initial_prompt,
         align_model_name = align_model_name,
+        align_batch=align_batch
     )
 
-# … ASR-Transcribe --------------------------------------------
+    # ----------------------------------------------------------
+    # 3.  TRANSCRIPCIÓN
+    # ----------------------------------------------------------
+
     batches = t.estimate_batches(audio_file, batch_size=asr_batch)
     if progress_hook:
         adv_transcribe = progress_hook.new_phase("ASR-Transcribe", batches, "lote")
     else:
         adv_transcribe = lambda *_: None
-    result = t.transcribe(
-        audio_file,
-        batch_size=asr_batch,
-        on_batch_end=lambda *_: adv_transcribe(1)
-    )
+
+    while True:
+        try:
+            result = t.transcribe(
+                audio_file,
+                batch_size=asr_batch,
+                on_batch_end=lambda *_: adv_transcribe(1)
+            )
+            break
+
+        except RuntimeError as e:
+            msg = str(e).lower()   
+            if "out of memory" in msg and asr_batch > 1:
+                old = asr_batch
+                asr_batch = max(1, asr_batch // 2)
+                print(f"[WARN] OOM con batch={old}, reintentando con batch={asr_batch}")
+                torch.cuda.empty_cache()
+                # Recalcular estimación y barra
+                batches = t.estimate_batches(audio_file, batch_size=asr_batch)
+                if progress_hook:
+                    adv_transcribe = progress_hook.new_phase("ASR-Transcribe", batches, "lote")
+                continue
+            else:
+                raise
+
+
     if progress_hook:
         adv_transcribe() 
         progress_hook.close_phase()
 
-# --- fase ASR-Align ----------------------------------------------
+    # ----------------------------------------------------------
+    # 4.  ALINEACIÓN
+    # ----------------------------------------------------------
+
     if not no_align:
         steps_align = len(result["segments"])
         adv_align = progress_hook.new_phase("ASR-Align", steps_align, "seg") if progress_hook else (lambda *_: None)

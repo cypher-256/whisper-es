@@ -1,8 +1,31 @@
 #./main.py
-import types, sys, os
+# --- configuración global Loggins única ------------------------------------
+import logging
+from rich.logging import RichHandler
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+    datefmt="%H:%M:%S",
+    handlers=[RichHandler(markup=False)],
+    force=True            # fuerza la reconfiguración si algo ya registró un handler
+)
 
-import torch
+# ❶ Filtro que descarta DEBUG e INFO de speechbrain
+class _DropSpeechBrainBelowWarning(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        # Si el logger pertenece a speechbrain y su nivel es inferior a WARNING, lo descartamos
+        if record.name.startswith("speechbrain") and record.levelno < logging.WARNING:
+            return False
+        return True
+logger = logging.getLogger()
+for handler in logger.handlers:
+    handler.addFilter(_DropSpeechBrainBelowWarning())
+# -------------------------------------------------------------------
+
+
+import types, sys, os
 sys.path.insert(0, os.path.abspath("./src"))
+import torch
 
 # --- silencia warning molesto ------------------------------------
 def _quiet_check(*a, **k):
@@ -12,12 +35,10 @@ mod.check_version = _quiet_check
 sys.modules["pyannote.audio.utils.version"] = mod
 # -------------------------------------------------------------------
 
-import logging
 import contextlib
 import argparse
 from pipelines.full_pipeline import run_pipeline
 from utils.hooks import ForcedProgressHook
-from rich.logging import RichHandler
 import utils.monkeypatch_pooling
 
 def main():
@@ -119,6 +140,12 @@ def main():
         help="Nombre del modelo de alignment a usar (p.ej. WAV2VEC2_ASR_LARGE_LV60K_960H)."
     )
     align_group.add_argument(
+        "--align-batch",
+        type=int,
+        default=None,                 # ← None indica “calcular”
+        help="Segmentos por lote durante la alineación; " "si se omite, se ajusta automáticamente según la RAM disponible"
+    )
+    align_group.add_argument(
         "--no-align",
         action="store_true",
         help="Omite la alineación fonética"
@@ -180,24 +207,46 @@ def main():
         help="Omite la fase de diarización, solo transcribe (y alinea si no está activado --no_align)",
     )
     args = parser.parse_args()
+    progress_hook = ForcedProgressHook(transient=True) if args.show_progress else None
 
+    if progress_hook:
+        for h in list(logger.handlers):
+            logger.removeHandler(h)
+        logger.addHandler(
+            RichHandler(console=progress_hook.console, markup=False, show_path=False)
+        )
 
+    # ------------------------------------------------------------------
+    # ➊ Ajuste dinámico de --asr-batch
+    # ------------------------------------------------------------------
     if args.asr_batch is None:
         if args.device == "cpu":
-            # En CPU, limitamos el batch según núcleos disponibles
-            # para no saturar la memoria RAM ni los hilos de Torch.
-            # Por ejemplo, podemos fijar batch = núcleos // 2, con mínimo 1 y máximo 4.
             cores = os.cpu_count() or 1
-            args.asr_batch = max(1, min(4, cores // 2))
+            args.asr_batch = max(1, min(8, cores))  # RTX 3090 Ti no usa CPU
         else:
-            # En GPU, miramos la VRAM total y dimensionamos batch
-            props = torch.cuda.get_device_properties(0)
-            vram_gb = props.total_memory / (1024 ** 3)
-            # Escalamos batch con un factor de 2 lotes por GB de VRAM
-            # y lo limitamos entre 4 y 16 para seguridad.
-            estimated = int(vram_gb * 2)
-            args.asr_batch = max(4, min(16, estimated))
+            props       = torch.cuda.get_device_properties(0)
+            total_vram  = props.total_memory // 2**20          # MiB
+            target_vram = int(total_vram * 0.80)               # 80 % seguro
 
+            # Consumo base (MiB por frame @ FP16) – valores refinados
+            base_mem = {
+                "tiny":      22,
+                "base":      35,
+                "small":     55,
+                "medium":    90,
+                "large":    135,
+                "large-v2": 135,
+                "turbo":    150,
+            }[args.model]
+
+            factor = {"float16": 1.30, "float32": 2.00, "int8": 0.70}[args.compute_type]
+            est_per_frame = base_mem * factor
+
+            batch_calc = max(4, int(target_vram // est_per_frame))
+            # Redondea al múltiplo de 4 más próximo y nunca sobrepasa 512
+            args.asr_batch = min(512, (batch_calc + 3) // 4 * 4)
+
+    logging.info(f"asr_batch dinámico = {args.asr_batch}")
 
     if args.device == "cpu" and args.compute_type in ("float16", "float32"):
         logging.warning("float16 no soportado en CPU y float32 muy lento → usando int8 en su lugar")
@@ -214,23 +263,11 @@ def main():
         args.chunk_size   = 15
         args.vad_method   = "silero"
 
-    # 1. Inicializa hook de progreso
-    progress_hook = ForcedProgressHook(transient=True) if args.show_progress else None
 
-    # 2. Configura logging con la consola de Rich
-    if progress_hook:
-        logging.basicConfig(
-            level=logging.INFO,
-            handlers=[RichHandler(console=progress_hook.console, markup=False)],
-            format="%(message)s",
-        )
-    else:
-        logging.basicConfig(
-            level=logging.INFO,
-            format="%(asctime)s %(levelname)s %(message)s",
-            datefmt="%H:%M:%S"
-        )
     logging.getLogger("pytorch_lightning").setLevel(logging.ERROR)
+    logging.info(f"Procesando {args.audio}")
+    logging.info(f"model={args.model}")
+    logging.info(f"Procesando {args.audio}")
 
     # 3. Ejecuta el pipeline dentro del contexto del hook
     if args.threads:
@@ -255,15 +292,17 @@ def main():
             vad_offset  = args.vad_offset,
             chunk_size  = args.chunk_size,
             no_align    = args.no_align,
+            align_model_name    = args.align_model,
+            align_batch = args.align_batch,
             return_char_alignments = args.return_char_alignments,
             no_diarize    = args.no_diarize,
             temperature = args.temperature,
             beam_size   = args.beam_size,
             initial_prompt = args.initial_prompt,
-            align_model_name    = args.align_model,
+            
         )
 
-    print(f"→ Transcripción guardada en {out}")
+    logging.info(f"→ Transcripción guardada en {out}")
 
 if __name__ == "__main__":
     main()

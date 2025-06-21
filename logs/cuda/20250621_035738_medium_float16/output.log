@@ -1,0 +1,10 @@
+03:57:42 INFO     03:57:42 INFO asr_batch dinámico = 164                                                                                                main.py:249
+         INFO     03:57:42 INFO Procesando tests/data/test_audio.wav                                                                                    main.py:268
+         INFO     03:57:42 INFO model=medium                                                                                                            main.py:269
+         INFO     03:57:42 INFO Procesando tests/data/test_audio.wav                                                                                    main.py:270
+         INFO     03:57:42 INFO align_batch dinámico = 22089 (RAM libre ≈ 12272 MiB, calc_batch ≈ 22089)                                        full_pipeline.py:54
+>>Performing voice activity detection using Pyannote...
+03:57:58 INFO     03:57:58 INFO TF32 deshabilitado para máxima reproducibilidad en VAD (WhisperX)                                                transcriber.py:139
+03:58:33 INFO     03:58:33 INFO Pipeline movido a cuda:0 (NVIDIA GeForce RTX 3090 Ti)                                                         pipeline_loader.py:47
+         INFO     03:58:33 INFO TF32 deshabilitado para máxima reproducibilidad en Speaker Diarization                                        pipeline_loader.py:57
+03:59:12 INFO     03:59:12 INFO → Transcripción guardada en transcripcion_diarizada.jsonl                                                               main.py:305

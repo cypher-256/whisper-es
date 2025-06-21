@@ -5,3 +5,4 @@ pandas
 pyannote.audio
 nvidia-cudnn-cu11==8.9.6.50
 tqdm
+psutil
