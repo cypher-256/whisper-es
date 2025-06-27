@@ -20,6 +20,7 @@ models/pyannote/*.bin
 # Ignorar salidas de prueba
 tests/out/*
 compare_bench.py
+monitor_run.sh
 grid_benchmark.sh
 recommend_config.py
 logs
