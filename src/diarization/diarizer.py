@@ -3,6 +3,7 @@ import pandas as pd
 import torchaudio
 from pyannote.core import Annotation
 from src.diarization.pipeline_loader import load_local_pipeline
+from typing import Optional
 from pyannote.audio.pipelines.utils.hook import ProgressHook
 
 class Diarizer:
@@ -13,7 +14,7 @@ class Diarizer:
         device: str = "cuda",
         models_root: str = "models/pyannote",
         allow_tf32: bool = False,
-        progress_hook: ProgressHook = None,
+        progress_hook: Optional[ProgressHook] = None,
     ):
         self.min_speakers = min_speakers
         self.max_speakers = max_speakers
@@ -48,6 +49,6 @@ class Diarizer:
                 "end": seg.end,
                 "speaker": speaker,
             }
-            for seg, _, speaker in annotation.itertracks(yield_label=True)
+            for seg, _, speaker in annotation.itertracks(yield_label=True) # type: ignore
         ]
         return pd.DataFrame.from_records(records)
