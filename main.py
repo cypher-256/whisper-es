@@ -31,7 +31,7 @@ import torch
 def _quiet_check(*a, **k):
     pass
 mod = types.ModuleType("pyannote.audio.utils.version")
-mod.check_version = _quiet_check
+mod.__dict__["check_version"] = _quiet_check
 sys.modules["pyannote.audio.utils.version"] = mod
 # -------------------------------------------------------------------
 
