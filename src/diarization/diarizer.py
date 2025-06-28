@@ -9,16 +9,16 @@ from pyannote.audio.pipelines.utils.hook import ProgressHook
 class Diarizer:
     def __init__(
         self,
-        min_speakers: int = 3,
-        max_speakers: int = 15,
-        device: str = "cuda",
+        min_speakers,
+        max_speakers,
+        device,
         models_root: str = "models/pyannote",
         allow_tf32: bool = False,
         progress_hook: Optional[ProgressHook] = None,
     ):
         self.min_speakers = min_speakers
         self.max_speakers = max_speakers
-        self.use_cuda = (device == "cuda")
+        self.use_cuda = device
         self.models_root = models_root
         self.allow_tf32 = allow_tf32
         self.progress_hook = progress_hook

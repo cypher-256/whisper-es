@@ -11,6 +11,7 @@ import torch
 import warnings
 from pyannote.audio.utils.reproducibility import ReproducibilityWarning
 import math, torchaudio
+from typing import Optional
 warnings.filterwarnings("ignore", category=ReproducibilityWarning)
 
 logger = logging.getLogger(__name__)
@@ -43,7 +44,7 @@ class Transcriber:
         beam_size,
         initial_prompt,
         align_batch,
-        align_model_name: str = None,
+        align_model_name: Optional[str] = None,
     ):
         self.model_name = model_name
         self.align_model_name = align_model_name
@@ -162,8 +163,8 @@ class Transcriber:
         align_model, meta = whisperx.load_align_model(
             language_code=result["language"],
             device=device,
-            model_name=chosen,     
-            model_dir=model_dir,    
+            model_name=chosen,
+            model_dir=model_dir,
         )
 
 

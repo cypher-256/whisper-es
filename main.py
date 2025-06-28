@@ -63,7 +63,7 @@ def main():
 
     asr_group.add_argument(
     "--model", "-m",
-    default="small",
+    default="large-v2",
     choices=[
         "tiny",
         "base",
@@ -235,7 +235,7 @@ def main():
                 "small":     55,
                 "medium":    90,
                 "large":    135,
-                "large-v2": 135,
+                "large-v2": 210,
                 "turbo":    150,
             }[args.model]
 

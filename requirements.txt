@@ -2,7 +2,7 @@ openai-whisper
 whisperx
 yt-dlp[default]
 pandas
-pyannote.audio
+pyannote.audio>=3.1
 nvidia-cudnn-cu11==8.9.6.50
 tqdm
 psutil
