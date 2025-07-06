@@ -55,6 +55,7 @@ BASE_URL="https://github.com/cypher-256/whisper-es/releases/download/v1.0"
 
 for MODEL in \
   pyannote_model_segmentation-3.0.bin \
+  pyannote_model_segmentation-3.0.ckpt \
   pyannote_model_wespeaker-voxceleb-resnet34-LM.bin; do
   echo "   – ${MODEL}"
   wget --progress=dot:giga \
