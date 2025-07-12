@@ -196,3 +196,11 @@ class Transcriber:
         duration = info.num_frames / info.sample_rate           # en segundos
         frames = math.ceil(duration / 30)
         return max(1, math.ceil(frames / batch_size))
+
+
+# -----------------------------------------------------------------------------
+# Copyright (c) 2022-2025 Max Bain et al. (whisperX)
+# License: BSD-2-Clause (véase LICENSE en la raíz)
+#
+# Modificaciones © 2025 cypher-256
+# -----------------------------------------------------------------------------
