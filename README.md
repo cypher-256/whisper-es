@@ -118,13 +118,21 @@ python main.py -h
    git push origin feature/nombre
    ```
 5. Abre un **PR** en GitHub.
-
-## Licencia
-
-Este proyecto está licenciado bajo la **MIT License**. Consulte el archivo `LICENSE` para más detalles.
-
+   
 ---
+
+## Créditos y atribución
+
+Este proyecto es un fork de **[whisperX](https://github.com/m-bain/whisperX)**, desarrollado por Max Bain et al., publicado bajo licencia BSD-2-Clause.
+
+
+### Licencia
+
+Este código base (whisperX) está bajo BSD-2-Clause. Consulta el archivo `LICENSE` para más detalles.
+
+
 ## Citation
+Si usas este software en publicaciones científicas, por favor cita:
    ```bash
 @article{bain2022whisperx,
   title={WhisperX: Time-Accurate Speech Transcription of Long-Form Audio},
@@ -133,11 +141,12 @@ Este proyecto está licenciado bajo la **MIT License**. Consulte el archivo `LIC
   year={2023}
 }
    ```
+
 ---
 
 ## 💸 Donaciones
 
-Si este dataset te ha sido útil y deseas apoyar su desarrollo, puedes contribuir con una donación en Bitcoin o Monero. Estas contribuciones ayudan a mantener y expandir recursos abiertos para el procesamiento del lenguaje en español chileno.
+Si este proyecto te ha sido útil y deseas apoyar su desarrollo, puedes contribuir con una donación en Bitcoin o Monero. Estas contribuciones ayudan a mantener y expandir recursos abiertos para el procesamiento del lenguaje en español.
 
 ### Bitcoin (BTC – On-chain)
 
