@@ -47,7 +47,7 @@ def main():
         epilog=(
             "whisper-es v1.0.0\n"
             "Basado en whisperX © 2022–2025 Max Bain et al. (BSD-2-Clause).\n"
-            "Modificaciones © 2025 TuNombre.\n"
+            "Modificaciones © 2025 cypher-256.\n"
             "Para más detalles, consulte el archivo LICENSE."
         )
     )
