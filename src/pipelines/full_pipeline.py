@@ -159,3 +159,10 @@ def run_pipeline(
     if progress_hook:
         progress_hook.close_phase()
     return path
+
+# -----------------------------------------------------------------------------
+# Copyright (c) 2022-2025 Max Bain et al. (whisperX)
+# License: BSD-2-Clause (véase LICENSE en la raíz)
+#
+# Modificaciones © 2025 cypher-256
+# -----------------------------------------------------------------------------
