@@ -43,7 +43,13 @@ import utils.monkeypatch_pooling
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Pipeline de transcripción y diarización"
+        description="Pipeline de transcripción y diarización",
+        epilog=(
+            "whisper-es v1.0.0\n"
+            "Basado en whisperX © 2022–2025 Max Bain et al. (BSD-2-Clause).\n"
+            "Modificaciones © 2025 TuNombre.\n"
+            "Para más detalles, consulte el archivo LICENSE."
+        )
     )
 
     # — Grupo I/O —
