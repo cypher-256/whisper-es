@@ -242,6 +242,7 @@ def main():
                 "medium":    90,
                 "large":    135,
                 "large-v2": 210,
+                "large-v3": 285,
                 "turbo":    150,
             }[args.model]
 
